@@ -24,7 +24,9 @@ html{scroll-behavior:smooth}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--c0);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
 
 /* ── NAV ── */
-nav{position:sticky;top:0;z-index:100;background:rgba(250,249,247,0.94);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--c1);padding:0 64px;display:flex;align-items:center;justify-content:space-between;height:64px}
+/* So o menu do topo: o seletor solto 'nav' pegava tambem o menu lateral das Politicas
+   (altura fixa de 64px e borda embaixo, que cortava o item 'Servicos'). */
+nav.topo{position:sticky;top:0;z-index:100;background:rgba(250,249,247,0.94);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--c1);padding:0 64px;display:flex;align-items:center;justify-content:space-between;height:64px}
 .nav-left{display:flex;align-items:center;gap:14px;text-decoration:none}
 .nav-dots{display:grid;grid-template-columns:repeat(3,6px);gap:4px}
 .nd{width:6px;height:6px;border-radius:50%}
@@ -207,7 +209,7 @@ footer{background:var(--c5);padding:64px 64px 32px}
 
 /* ── MOBILE ── */
 @media(max-width:768px){
-  nav{padding:0 20px}
+  nav.topo{padding:0 20px}
   .nav-links{display:none}
   .hero{padding:40px 20px;flex-direction:column;min-height:auto;padding-top:60px}
   .hero-right{width:100%}
@@ -228,7 +230,7 @@ footer{background:var(--c5);padding:64px 64px 32px}
 <body>
 
 <!-- NAV -->
-<nav>
+<nav class="topo">
   <a href="#" class="nav-left">
     <div class="nav-dots">
       <div class="nd" style="background:#827768"></div><div class="nd" style="background:#827768"></div><div class="nd" style="background:#ceccca"></div>
@@ -460,7 +462,7 @@ footer{background:var(--c5);padding:64px 64px 32px}
         <div class="clinica-sep"></div>
         <div class="clinica-detalhe">
           <span class="clinica-detalhe-label">Horários de atendimento</span>
-          <span class="clinica-detalhe-val">Segunda: 17h–19h</span>
+          <span class="clinica-detalhe-val">Terça: 8h–11h</span>
           <span class="clinica-detalhe-val">Quarta: 14h–18h</span>
           <span class="clinica-detalhe-val">Quinta: 8h–13h e 14h–18h</span>
           <span class="clinica-detalhe-val">Sexta: 14h–17h</span>
@@ -567,11 +569,11 @@ footer{background:var(--c5);padding:64px 64px 32px}
             <table class="sch-table">
               <thead><tr><th>Dia</th><th>Horário</th></tr></thead>
               <tbody>
-                <tr><td class="day">Segunda-feira</td><td>17h às 19h</td></tr>
+                <tr><td class="day">Terça-feira</td><td>08h às 11h</td></tr>
                 <tr><td class="day">Quarta-feira</td><td>14h às 18h</td></tr>
                 <tr><td class="day">Quinta-feira</td><td>08h às 13h e 14h às 18h</td></tr>
                 <tr><td class="day">Sexta-feira</td><td>14h às 17h</td></tr>
-                <tr><td class="day no">Terça, sábado e domingo</td><td class="no">Sem atendimento</td></tr>
+                <tr><td class="day no">Segunda, sábado e domingo</td><td class="no">Sem atendimento</td></tr>
               </tbody>
             </table>
             <p>Todo agendamento requer no mínimo <strong>12 horas de antecedência</strong>. Pedidos fora desse prazo podem ser avaliados como encaixe — entre em contato pelo WhatsApp.</p>
