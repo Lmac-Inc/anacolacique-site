@@ -125,8 +125,12 @@ nav.topo{position:sticky;top:0;z-index:100;background:rgba(250,249,247,0.94);bac
 /* ── INSTAGRAM ── */
 .instagram-section{background:var(--bg2)}
 .insta-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:40px}
-.insta-placeholder{aspect-ratio:1;background:var(--c1);border-radius:8px;border:0.5px solid var(--c2);display:flex;align-items:center;justify-content:center}
-.insta-placeholder span{font-size:9px;color:var(--c3);letter-spacing:0.06em;text-transform:uppercase;font-weight:500}
+.insta-grid[hidden]{display:none}
+.insta-post{position:relative;display:block;aspect-ratio:1;background:var(--c1);border-radius:8px;border:0.5px solid var(--c2);overflow:hidden}
+.insta-post img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.4s ease}
+.insta-post:hover img{transform:scale(1.04)}
+.insta-post:focus-visible{outline:2px solid var(--c5);outline-offset:2px}
+.insta-tipo{position:absolute;top:8px;right:8px;width:18px;height:18px;stroke:#fff;fill:none;stroke-width:1.8;filter:drop-shadow(0 1px 2px rgba(90,85,80,0.6))}
 .insta-cta{margin-top:28px}
 
 /* ── PORTAL ── */
@@ -487,14 +491,9 @@ footer{background:var(--c5);padding:64px 64px 32px}
     <div style="max-width:1200px;margin:0 auto">
       <span class="sec-tag">@anacolacique</span>
       <h2 class="sec-h">Acompanhe no <em>Instagram.</em></h2>
-      <div class="insta-grid">
-        <div class="insta-placeholder"><span>post</span></div>
-        <div class="insta-placeholder"><span>post</span></div>
-        <div class="insta-placeholder"><span>post</span></div>
-        <div class="insta-placeholder"><span>post</span></div>
-        <div class="insta-placeholder"><span>post</span></div>
-        <div class="insta-placeholder"><span>post</span></div>
-      </div>
+      <!-- Os posts vêm do Instagram da Dra. pelo Aura (/api/site/instagram). Sem conta
+           ligada ou sem resposta, a grade fica escondida e sobra só o botão. -->
+      <div class="insta-grid" id="insta-grid" hidden></div>
       <div class="insta-cta">
         <a href="https://www.instagram.com/anacolacique/" class="btn-outline" target="_blank">Seguir no Instagram</a>
       </div>
@@ -761,6 +760,53 @@ async function carregarFotos() {
 }
 
 carregarFotos();
+
+// ── Instagram: últimos posts reais (relato da Dra., 05/11/2026) ──
+// O Aura lê a conta ligada em Configurações → Integrações e devolve só link,
+// imagem e começo da legenda. Nada é montado com innerHTML: a legenda é texto.
+async function carregarInstagram() {
+  const grade = document.getElementById('insta-grid');
+  if (!grade) return;
+  try {
+    const res = await fetch('https://aura.anacolacique.com.br/api/site/instagram');
+    if (!res.ok) return;
+    const { posts } = await res.json();
+    if (!Array.isArray(posts) || posts.length === 0) return;
+    const ns = 'http://www.w3.org/2000/svg';
+    posts.slice(0, 6).forEach(p => {
+      if (typeof p.link !== 'string' || !p.link.startsWith('https://') ||
+          typeof p.imagem !== 'string' || !p.imagem.startsWith('https://')) return;
+      const a = document.createElement('a');
+      a.className = 'insta-post';
+      a.href = p.link;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      const img = document.createElement('img');
+      img.src = p.imagem;
+      img.loading = 'lazy';
+      img.alt = p.legenda ? p.legenda : 'Post da Dra. Ana Colacique no Instagram';
+      // Imagem que não carrega (URL vencida da Meta) tira o quadro em vez de deixar um buraco.
+      img.addEventListener('error', () => { a.remove(); if (!grade.children.length) grade.hidden = true; });
+      a.appendChild(img);
+      if (p.tipo === 'video' || p.tipo === 'carrossel') {
+        const icone = document.createElementNS(ns, 'svg');
+        icone.setAttribute('class', 'insta-tipo');
+        icone.setAttribute('viewBox', '0 0 24 24');
+        icone.setAttribute('aria-hidden', 'true');
+        const forma = document.createElementNS(ns, 'path');
+        forma.setAttribute('d', p.tipo === 'video' ? 'M8 5v14l11-7z' : 'M8 8h11v11H8z M5 16V5h11');
+        icone.appendChild(forma);
+        a.appendChild(icone);
+      }
+      grade.appendChild(a);
+    });
+    if (grade.children.length) grade.hidden = false;
+  } catch (e) {
+    console.log('Instagram não carregado:', e);
+  }
+}
+
+carregarInstagram();
 
 // ── Aurora chat no site ──
 const auraHistory = []
